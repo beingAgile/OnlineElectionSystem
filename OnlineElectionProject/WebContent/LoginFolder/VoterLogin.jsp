@@ -89,15 +89,43 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
     		    <button type="submit" name="voterLogin" value="voterLogin" class="btn btn-primary btn-block btn-large">Let me in.</button>
    			 </form>
    			 <% 
+   			 	 Statement statement;
+   			 	 ResultSet resultSet;
+   			 	 String sql;	
    				 try{
    						Class.forName("oracle.jdbc.driver.OracleDriver");
 						Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "garima07");
-  	 					Statement statement = con.createStatement();
-   						String sql = "select * from ELECTION_STATUS";
-   						ResultSet resultSet = statement.executeQuery(sql);
+  	 					statement = con.createStatement();
+   						sql = "select * from ELECTION_STATUS";
+   						resultSet = statement.executeQuery(sql);
    						if(resultSet.next()){
    							if(resultSet.getInt(1)==0){
    								out.print("<p><font color='white'>Not a voter yet! &nbsp;&nbsp;<a href='VoterSignup.jsp'>Register Here</a></font></p>");
+   							}
+   						}	
+   						String submit = request.getParameter("voterLogin");
+   						
+   						if(submit!=null && submit.equals("voterLogin")){
+   							String userId = request.getParameter("userId");
+   							String password = request.getParameter("password");
+   							statement = con.createStatement();
+   							sql = "select id,password from VOTERS";
+   							resultSet = statement.executeQuery(sql);		
+   							
+   							int flag=0;
+   							while(resultSet.next()){
+   								if(userId.equals(resultSet.getString(1)) && password.equals(resultSet.getString(2))){
+   									flag=1;
+   									session.setAttribute("userId",userId);
+   									session.setAttribute("password",password);
+   									%>
+   									 <jsp:forward page="/VoterPanel.jsp"/>
+   									<% 
+   								}
+   							}
+   							
+   							if(flag==0){
+   								out.print("<font color='white'><p>Invalid Id or Password! Try Again!!</p></font>");
    							}
    						}
    			 	}catch(Exception e){

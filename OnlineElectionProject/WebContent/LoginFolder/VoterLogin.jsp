@@ -104,7 +104,6 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
    							}
    						}	
    						String submit = request.getParameter("voterLogin");
-   						
    						if(submit!=null && submit.equals("voterLogin")){
    							String userId = request.getParameter("userId");
    							String password = request.getParameter("password");
@@ -125,7 +124,7 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
    							}
    							
    							if(flag==0){
-   								out.print("<font color='white'><p>Invalid Id or Password! Try Again!!</p></font>");
+   								out.print("<font color='white'><p>Invalid Id or Password </p></font>");
    							}
    						}
    			 	}catch(Exception e){

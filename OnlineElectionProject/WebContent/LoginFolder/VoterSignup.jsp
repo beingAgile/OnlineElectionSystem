@@ -2,7 +2,7 @@
 <html >
   <head>
     <meta charset="UTF-8">
-    <title>Login Form</title>
+    <title>Voter Signup Form</title>
    
     <link rel="stylesheet" href="css/normalize.css">
    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
@@ -40,7 +40,7 @@ body {
 }
 .login { 
 	position: absolute;
-	top: 50%;
+	top: 40%;
 	left: 50%;
 	margin: -150px 0 0 -150px;
 	width:300px;
@@ -82,31 +82,70 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
     		
     		error_string="The SignUp cannot proceed due to following -:\n\n";
     		
-    		var fn = validateFirstName();
-    		var ln = validateLastName();
-    		var an = validateAdhaarNumber();
-    		
-    		if(fn & ln & an){
-    			return true;
+    		var db = validatedob();
+    		if(db==true){
+    			var fn = validateFirstName();
+        		var ln = validateLastName();
+        		var an = validateAdhaarNumber();
+        		var gd = validateGender();
+        		if(fn & ln & an & gd){
+        			return true;
+        		}
+        		else{
+        			alert(error_string);
+        			return false;
+        		}
     		}
     		else{
-    			alert(error_string);
+    			alert("You must be 18 years old to be a voter.");
     			return false;
     		}
     	}
     	
+    	function validateGender(){
+    		var gender = vSignup.gender.value.toUpperCase();
+    		if(gender=="MALE" || gender=="FEMALE" || gender=="OTHER")
+    			return true;
+    		error_string+="Gender can only contain male,female or other\n";
+    		return false;
+    	}
+    	
     	function validateFirstName(){
     		var firstName = vSignup.firstName.value;
-    		if(firstName.length< 2 | firstName.length >25 | !isNaN(firstName)| pattern.test(firstName)){
+    		if(firstName.length< 2 || firstName.length >25 || !isNaN(firstName)|| pattern.test(firstName)){
     			error_string+="First Name is not valid\n";
     			return false;
     		}
     		return true;
     	}
     	
+    	function validatedob(){
+    		
+    		var today = new Date();
+    		var td = today.getDate();
+    		var tm = today.getMonth()+1; //January is 0!
+    		var tyyy = today.getFullYear(); 
+    		
+    		var bdate= vSignup.dob.value;
+    		bdate = bdate.split('/');
+    		var dd = parseInt(bdate[0]);  
+    		var mm  = parseInt(bdate[1]);  
+    		var yyyy = parseInt(bdate[2]);
+    	
+    		var age = tyyy - yyyy;
+    		if(tm < mm-1)
+    			age--;
+    		if(((mm-1)==tm) && (td < dd))
+    			age--;
+ 				//alert(age);
+			if(age>=18)
+				return true;
+			return false;
+    	}
+    	
     	function validateLastName(){
     		var lastName = vSignup.lastName.value;
-    		if(lastName.length<2 | lastName.length >25 |!isNaN(lastName)|pattern.test(lastName)){
+    		if(lastName.length<2 || lastName.length >25 ||!isNaN(lastName) || pattern.test(lastName)){
     			error_string+="Last Name is not valid\n";
     			return false;
     		}
@@ -115,7 +154,7 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
     	
     	function validateAdhaarNumber(){
     		var adhaarNumber = vSignup.adhaarNumber.value;
-    		if(adhaarNumber.length != 12 | isNaN(adhaarNumber)){
+    		if(adhaarNumber.length != 12 || isNaN(adhaarNumber)){
     			error_string+="Adhaar Number is not valid\n";
     			return false;
     		}
@@ -135,9 +174,11 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
    	    <form method="post" onSubmit="return validate(this)" action="VoterSignup.jsp" name="vSignup" >
     		<input type="text" name="firstName" placeholder="First Name" value="" required="required" />
   	        <input type="text" name="lastName" placeholder="Last Name" value=""  required="required" />
+  	        <input type="text" name="dob" placeholder="Date of birth (DD/MM/YYYY)" value="" required="required" />
+  	        <input type="text" name="gender" placeholder="Gender (Male/Female/Other)" value="" required="required" /> 
       	    <input type="email" name="email" placeholder="Email" value=""  required="required" />
        	    <input type="number" name="adhaarNumber" placeholder="Adhaar Card Number (Without space)" value=""  required="required" />
-        	<button type="submit" name="voterSignup" value="voterSignup" class="btn btn-primary btn-block btn-large">Let me in.</button>
+        	<button type="submit" name="voterSignup" value="voterSignup" class="btn btn-primary btn-block btn-large">Register me</button>
     	</form>
     	
     	<%  
@@ -156,6 +197,8 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
 				   //out.print(lastName);
 				   String email = request.getParameter("email") ;
 				   //out.print(email);
+				   String gender = request.getParameter("gender") ;
+				   String dob = request.getParameter("dob") ;
 				   String adhaarNumber =request.getParameter("adhaarNumber");
 				   long adhaar_number = Long.parseLong(adhaarNumber);
 				   //out.print(adhaar_number);
@@ -168,10 +211,10 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
 				  // out.print("got resultset");
 				   
 				   int flag=0;
-				   long userId=99999;
+				   
 				   
 				   while(resultSet.next()){
-					   userId = resultSet.getLong(1);
+					   
 					   if(email.equals(resultSet.getString(5))|| adhaar_number == resultSet.getLong(6) ){
 						   out.print("<p><center><font color='white'>Already registered Email or Adhaar Card Number !!</font></center></p>");
 						   flag=1;
@@ -183,24 +226,27 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
 					   
 					  // out.print("flag remained 0");
 				
-					  userId=userId+1;	   
+					  	   
 					   String password = firstName.substring(0,1)+email.substring(3,5)+lastName.substring(0,1)+adhaarNumber.substring(7,8)+firstName.substring(1,2)+lastName.substring(0,1)+
 							   adhaarNumber.substring(3,4);
 					  // out.print(password);
 					  
-					   sql = "insert into VOTERS values(id_seq.nextval,?,?,?,?,?)";
+					   sql = "insert into VOTERS values(id_seq.nextval,?,?,?,?,?,?,?)";
 					   PreparedStatement preparedStatement = con.prepareStatement(sql);
-					  
 					   preparedStatement.setString(1,password);
 					   preparedStatement.setString(2,firstName);
 					   preparedStatement.setString(3,lastName);
 					   preparedStatement.setString(4,email);
 					   preparedStatement.setLong(5,adhaar_number);
+					   preparedStatement.setString(6,gender);
+					   preparedStatement.setString(7,dob);
 					  
 					   //out.print("Before Update");
 					   int i =preparedStatement.executeUpdate();
-					   out.print("<p><font color='white'><center>You have registered successfully!<br>Login Id &nbsp;:&nbsp;"+ userId +"<br>Password &nbsp;&nbsp;"+password+"<br><a href='VoterLogin.jsp'>Click Here to Login</center></font></p>");
 					   
+					   resultSet=statement.executeQuery("select id from VOTERS where ADHAARNUMBER="+adhaar_number);
+					   if(resultSet.next())
+					   out.print("<p><font color='white'><center>You have registered successfully!<br>Login Id &nbsp;:&nbsp;"+ resultSet.getLong(1) +"<br>Password &nbsp;&nbsp;"+password+"<br><a href='VoterLogin.jsp'>Click Here to Login</center></font></p>");		   
 				   }
 			   }
     	   }catch(Exception e){

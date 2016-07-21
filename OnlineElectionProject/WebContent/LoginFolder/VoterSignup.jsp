@@ -40,7 +40,7 @@ body {
 }
 .login { 
 	position: absolute;
-	top: 40%;
+	top: 30%;
 	left: 50%;
 	margin: -150px 0 0 -150px;
 	width:300px;
@@ -171,7 +171,8 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
   		<a href="/OnlineElectionProject/index.html"><i class="fa fa-home" style="font-size:60px;color:white;"></i></a>
     <div class="login">
 		<h1>SignUp</h1>
-   	    <form method="post" onSubmit="return validate(this)" action="VoterSignup.jsp" name="vSignup" >
+		${result}
+   	    <form method="post" onSubmit="return validate(this)" action="../VoterServlet" name="vSignup" >
     		<input type="text" name="firstName" placeholder="First Name" value="" required="required" />
   	        <input type="text" name="lastName" placeholder="Last Name" value=""  required="required" />
   	        <input type="text" name="dob" placeholder="Date of birth (DD/MM/YYYY)" value="" required="required" />
@@ -180,87 +181,9 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
        	    <input type="number" name="adhaarNumber" placeholder="Adhaar Card Number (Without space)" value=""  required="required" />
         	<button type="submit" name="voterSignup" value="voterSignup" class="btn btn-primary btn-block btn-large">Register me</button>
     	</form>
-    	
-    	<%  
-    	   try{
-    		   Class.forName("oracle.jdbc.driver.OracleDriver");
-			   Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "garima07");
-			   
-			   String submit= request.getParameter("voterSignup");
-			   if(submit!=null && submit.equals("voterSignup")){
-				   
-				   //out.print("in submit");
-				   
-				   String firstName = request.getParameter("firstName");
-				   //out.print(firstName);
-				   String lastName = request.getParameter("lastName");
-				   //out.print(lastName);
-				   String email = request.getParameter("email") ;
-				   //out.print(email);
-				   String gender = request.getParameter("gender") ;
-				   String dob = request.getParameter("dob") ;
-				   String adhaarNumber =request.getParameter("adhaarNumber");
-				   long adhaar_number = Long.parseLong(adhaarNumber);
-				   //out.print(adhaar_number);
-				   //out.print("got parameters");
-				   
-				   Statement statement = con.createStatement();
-				   String sql = "select * from VOTERS";
-				   ResultSet resultSet = statement.executeQuery(sql);
-				   
-				  // out.print("got resultset");
-				   
-				   int flag=0;
-				   
-				   
-				   while(resultSet.next()){
-					   
-					   if(email.equals(resultSet.getString(5))|| adhaar_number == resultSet.getLong(6) ){
-						   out.print("<p><center><font color='white'>Already registered Email or Adhaar Card Number !!</font></center></p>");
-						   flag=1;
-						   break;
-					   }
-				   }
-				   
-				   if(flag==0){
-					   
-					  // out.print("flag remained 0");
-				
-					  	   
-					   String password = firstName.substring(0,1)+email.substring(3,5)+lastName.substring(0,1)+adhaarNumber.substring(7,8)+firstName.substring(1,2)+lastName.substring(0,1)+
-							   adhaarNumber.substring(3,4);
-					  // out.print(password);
-					  
-					   sql = "insert into VOTERS values(id_seq.nextval,?,?,?,?,?,?,?)";
-					   PreparedStatement preparedStatement = con.prepareStatement(sql);
-					   preparedStatement.setString(1,password);
-					   preparedStatement.setString(2,firstName);
-					   preparedStatement.setString(3,lastName);
-					   preparedStatement.setString(4,email);
-					   preparedStatement.setLong(5,adhaar_number);
-					   preparedStatement.setString(6,gender);
-					   preparedStatement.setString(7,dob);
-					  
-					   //out.print("Before Update");
-					   int i =preparedStatement.executeUpdate();
-					   
-					   resultSet=statement.executeQuery("select id from VOTERS where ADHAARNUMBER="+adhaar_number);
-					   if(resultSet.next())
-					   out.print("<p><font color='white'><center>You have registered successfully!<br>Login Id &nbsp;:&nbsp;"+ resultSet.getLong(1) +"<br>Password &nbsp;&nbsp;"+password+"<br><a href='VoterLogin.jsp'>Click Here to Login</center></font></p>");		   
-				   }
-			   }
-    	   }catch(Exception e){
-    		   System.out.println("Exception in VoterSignup");
-    		   e.printStackTrace();
-    	   }
-    	%>
 	</div>
     
         <script src="js/index.js"></script>
   </body>
 </html>
 
-<%@ page import="java.lang.*" %>
-<%@ page import="java.io.*" %>
-<%@ page import="java.sql.*" %>
-<%@ page import="java.math.*" %>

@@ -43,9 +43,7 @@
   </div>
  
 <div style="margin-left:16%;padding:1px 16px;height:1000px;">
-  
 </div>
-
 </body>
 </html>
     <!-- REMINDER : WHENEVER THE LOGIN PAGE IS LOADED CHECK THAT SESSION ATTRIBUTE IS NOT NULL AND  -->

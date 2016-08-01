@@ -15,6 +15,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 /**
@@ -72,10 +73,11 @@ public class CandidateServlet extends HttpServlet {
 			inputStream = adhaarCard.getInputStream();
 		}
 		
+		String result =null;
 		Connection con=null;
-		int result =-1;
-		
 		try{
+			HttpSession session = request.getSession(false);
+			
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "garima07");
 			
@@ -83,7 +85,7 @@ public class CandidateServlet extends HttpServlet {
 			String sql ="select * from Candidate where adhaarNumber='"+adhaarNumber+"' or email ='"+email+"'";
 			ResultSet resultSet = statement.executeQuery(sql);
 			if(resultSet.next()){
-				request.setAttribute("result", "<p><center><font color='white'>Already registered Email or Adhaar Card Number !!</font></center></p>");
+				result="0";
 			}
 			else{
 					String password = firstName.substring(0,1)+email.substring(3,5)+lastName.substring(0,1)+gender.substring(2,3)+firstName.substring(1,2)+lastName.substring(0,1)+
@@ -104,24 +106,20 @@ public class CandidateServlet extends HttpServlet {
 					preparedStatement.setBlob(10, inputStream);
 					preparedStatement.setLong(11, mobile);
 					
-					result =preparedStatement.executeUpdate();
+					int res =preparedStatement.executeUpdate();
 					System.out.println(result);
-					if(result>=1){
+					if(res>=1){
 						resultSet=statement.executeQuery("select * from CANDIDATE where ADHAARNUMBER="+adhaarNumber);
-						System.out.println("fond that record");
-				
 						if(resultSet.next()){	
-						System.out.println("hola");
-						request.setAttribute("result","<p><font color='white'><center>You have registered successfully!<br>Login Id &nbsp;:&nbsp;"+ resultSet.getLong(1) +"<br>Password &nbsp;&nbsp;"+password+"<br><a href='LoginFolder/CandidateLogin.jsp'>Click Here to Login</center></font></p>");
+							result="1";
+							session.setAttribute("userId", resultSet.getLong(1));
+							session.setAttribute("password", password);
 						}
 					}
 					else{
-						request.setAttribute("result", "<p><font color='white'><center>Cannot register right now!<br> Try again later!</center></font></p>");
+							result="-1";
 					}
-			}
-			
-			
-			
+			}	
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
@@ -133,7 +131,6 @@ public class CandidateServlet extends HttpServlet {
 				}
 			}
 		}
-		// TODO Auto-generated method stub
-		request.getRequestDispatcher("/LoginFolder/CandidateSignup.jsp").forward(request, response);
+		response.sendRedirect("LoginFolder/CandidateSignup.jsp?result"+result);
 	}
 }

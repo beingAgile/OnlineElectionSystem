@@ -85,13 +85,13 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
    			 <form method="post" action="AdminLogin.jsp">
     			<input type="text" name="userId" placeholder="UserId" required="required" value="" />
     		    <input type="password" name="password" placeholder="Password" required="required" value=""/>
-       		    <button type="submit" name="adminLogin" value="adminLogin" class="btn btn-primary btn-block btn-large">Let me in.</button>
+       		    <button type="submit" name="adminAction" value="adminLogin" class="btn btn-primary btn-block btn-large">Let me in.</button>
    			 </form>
    			 <%
 			try{
 				Class.forName("oracle.jdbc.driver.OracleDriver");
 				Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "garima07");
-				String submit = request.getParameter("adminLogin");
+				String submit = request.getParameter("adminAction");
 					if(submit!=null && submit.equals("adminLogin")){
 						
 						String userId = request.getParameter("userId");
@@ -105,14 +105,19 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
 							if(userId.equals(resultSet.getString(1)) && password.equals(resultSet.getString(2))){
 								session.setAttribute("userId",userId);
 								session.setAttribute("password",password);
-								%>
-								<jsp:forward page="/AdminPanel.jsp"></jsp:forward>
-								<% 
+								System.out.println("forwarding");
+								
+								response.sendRedirect("../AdminPanel.jsp");
 							}
 							else{
 								out.print("<font color=white><p> Invalid Id or Password! Try Again!! </p> </font>");
 							}
 						}
+					}
+					else if(submit!=null && submit.equals("adminLogout")){
+						session.removeAttribute("userId");
+						session.removeAttribute("password");
+						out.print("<font color=white><p> You have logged out successfully !! </p> </font>");
 					}
 			}catch(Exception e){
 				 out.println("Exception Admin Login");

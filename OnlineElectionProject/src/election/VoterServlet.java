@@ -12,6 +12,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * Servlet implementation class VoterServlet
@@ -40,6 +41,7 @@ public class VoterServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		 
 		   String firstName = request.getParameter("firstName");
 		   String lastName = request.getParameter("lastName");
 		   String email = request.getParameter("email") ;
@@ -48,15 +50,18 @@ public class VoterServlet extends HttpServlet {
 		   String adhaarNumber =request.getParameter("adhaarNumber");
 		   long adhaar_number = Long.parseLong(adhaarNumber);
 		   
-		   
+		   String result=null;
 		   try{
+			   HttpSession session= request.getSession();
+			   
+			   
     		   Class.forName("oracle.jdbc.driver.OracleDriver");
 			   Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "garima07");  
 			   Statement statement = con.createStatement();
 			   String sql = "select * from Voters where adhaarNumber='"+adhaarNumber+"' or email ='"+email+"'";
 			   ResultSet resultSet = statement.executeQuery(sql);
 				if(resultSet.next()){
-					request.setAttribute("result", "<p><center><font color='white'>Already registered Email or Adhaar Card Number !!</font></center></p>");
+					result="0";
 				}
 				else{
 					
@@ -77,10 +82,12 @@ public class VoterServlet extends HttpServlet {
 					   if(i>0){
 						   resultSet=statement.executeQuery("select id from VOTERS where ADHAARNUMBER="+adhaar_number);
 						   if(resultSet.next())
-						      request.setAttribute("result","<p><font color='white'><center>You have registered successfully!<br>Login Id &nbsp;:&nbsp;"+ resultSet.getLong(1) +"<br>Password &nbsp;&nbsp;"+password+"<br><a href='LoginFolder/VoterLogin.jsp'>Click Here to Login</center></font></p>");		   
+						     result="1";	
+						     session.setAttribute("userId", resultSet.getLong(1));
+						     session.setAttribute("password", password);
 						   }
 						   else{
-							  request.setAttribute("result","<p><font color='white'><center>Cannot register right now!<br> Try again later!</center></font></p>");		      
+							 result="-1";		      
 						   }
 					}
     	   }catch(Exception e){
@@ -88,7 +95,7 @@ public class VoterServlet extends HttpServlet {
     		   e.printStackTrace();
     	   }
 		   
-		   request.getRequestDispatcher("/LoginFolder/VoterSignup.jsp").forward(request, response);
+		   response.sendRedirect("LoginFolder/VoterSignup.jsp?result="+result);
 	}
 
 }

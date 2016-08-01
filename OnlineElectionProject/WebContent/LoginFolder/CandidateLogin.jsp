@@ -85,8 +85,9 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
    			 <form method="post">
     			<input type="text" name="userId" value="" placeholder="UserId" required="required" />
     		    <input type="password" name="password" value="" placeholder="Password" required="required" />
-       		    <button type="submit" name="candidateLogin" value="candidateLogin" class="btn btn-primary btn-block btn-large">Let me in.</button>
+       		    <button type="submit" name="candidateAction" value="candidateLogin" class="btn btn-primary btn-block btn-large">Let me in.</button>
    			 </form>
+   			 
    			 <% 
    				 try{
    						Class.forName("oracle.jdbc.driver.OracleDriver");
@@ -99,7 +100,32 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
    								out.print("<p><font color='white'>Not a candidate yet! &nbsp;&nbsp;<a href='CandidateSignup.jsp'>Register Here</a></font></p>");
    							}
    						}
-   			 	}catch(Exception e){
+   						
+   						String submit = request.getParameter("candidateAction");
+   						if(submit!=null && submit.equals("candidateLogin")){
+   							String userId = request.getParameter("userId");
+   							String password = request.getParameter("password");
+   							statement = con.createStatement();
+   							sql = "select id,password from CANDIDATE";
+   							resultSet = statement.executeQuery(sql);		
+   							
+   							int flag=0;
+   							while(resultSet.next()){
+   								if(userId.equals(resultSet.getString(1)) && password.equals(resultSet.getString(2))){
+   									flag=1;
+   									session.setAttribute("userId",userId);
+   									session.setAttribute("password",password);
+   									%>
+   									 <jsp:forward page="/CandidatePanel.jsp"/>
+   									<% 
+   								}
+   							}
+   							
+   							if(flag==0){
+   								out.print("<font color='white'><p>Invalid Id or Password </p></font>");
+   							}	
+   						}
+   				 }catch(Exception e){
    			 		System.out.println("Candidate Login Exception");
    			 		e.printStackTrace();
    			 	}

@@ -86,7 +86,7 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
    			<form method="post" action="VoterLogin.jsp">
     			<input type="text" name="userId" value="" placeholder="UserId" required="required" />
     		    <input type="password" name="password" value="" placeholder="Password" required="required" />
-    		    <button type="submit" name="voterLogin" value="voterLogin" class="btn btn-primary btn-block btn-large">Let me in.</button>
+    		    <button type="submit" name="voterAction" value="voterLogin" class="btn btn-primary btn-block btn-large">Let me in.</button>
    			 </form>
    			 <% 
    			 	 Statement statement;
@@ -103,7 +103,8 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
    								out.print("<p><font color='white'>Not a voter yet! &nbsp;&nbsp;<a href='VoterSignup.jsp'>Register Here</a></font></p>");
    							}
    						}	
-   						String submit = request.getParameter("voterLogin");
+   						
+   						String submit = request.getParameter("voterAction");
    						if(submit!=null && submit.equals("voterLogin")){
    							String userId = request.getParameter("userId");
    							String password = request.getParameter("password");
@@ -136,6 +137,9 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
         <script src="js/index.js"></script>    
   </body>
 </html>
+
+
+
 <%@ page import="java.io.*" %>
 <%@ page import="java.lang.*" %>
 <%@ page import="java.sql.*" %>

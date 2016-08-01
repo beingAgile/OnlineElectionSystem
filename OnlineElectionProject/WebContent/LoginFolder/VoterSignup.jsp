@@ -164,14 +164,32 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
 
     
   </head>
-
   <body link="white" alink="white" vlink="white">
   	<br>
 	&nbsp; &nbsp; &nbsp; &nbsp;
   		<a href="/OnlineElectionProject/index.html"><i class="fa fa-home" style="font-size:60px;color:white;"></i></a>
     <div class="login">
 		<h1>SignUp</h1>
-		${result}
+		<%
+		  String result = request.getParameter("result");
+				System.out.println(result);
+				if(result!=null){
+					if(result.equals("0")){
+						out.println("<p><center><font color='white'>Already registered Email or Adhaar Card Number !!</font></center></p>");
+					}
+					else if(result.equals("1")){
+						Long userId= (Long) session.getAttribute("userId");
+						String password = (String) session.getAttribute("password");
+						out.println("<p><font color='white'><center>You have registered successfully!<br>Login Id &nbsp;:&nbsp;"+ userId +"<br>Password &nbsp;&nbsp;"+password+"<br><a href='VoterLogin.jsp'>Click Here to Login</a></center></font></p>");
+						session.removeAttribute("userId");
+						session.removeAttribute("password");
+					}
+					else if(result.equals("-1")){
+						out.println("<p><font color='white'><center>Cannot register right now!<br> Try again later!</center></font></p>");
+					}
+				}
+		%>
+		
    	    <form method="post" onSubmit="return validate(this)" action="../VoterServlet" name="vSignup" >
     		<input type="text" name="firstName" placeholder="First Name" value="" required="required" />
   	        <input type="text" name="lastName" placeholder="Last Name" value=""  required="required" />

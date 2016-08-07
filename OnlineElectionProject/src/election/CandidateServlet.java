@@ -63,6 +63,7 @@ public class CandidateServlet extends HttpServlet {
 		//response.getWriter().println(mobile);
 		long adhaarNumber = Long.parseLong(request.getParameter("adhaarNumber"));
 		//response.getWriter().println(adhaarNumber);
+		String messageVoters = request.getParameter("messageVoters");
 		
 		InputStream inputStream = null;
 		Part adhaarCard = request.getPart("adhaarCard");
@@ -90,8 +91,9 @@ public class CandidateServlet extends HttpServlet {
 			else{
 					String password = firstName.substring(0,1)+email.substring(3,5)+lastName.substring(0,1)+gender.substring(2,3)+firstName.substring(1,2)+lastName.substring(0,1)+
 						   gender.substring(3,4);
-				 	sql = "insert into candidate values(candidate_id_seq.nextval,?,?,?,?,?,?,?,?,?,?,?)";
+				 	sql = "insert into candidate values(candidate_id_seq.nextval,?,?,?,?,?,?,?,?,?,?,?,?,'0')";
 				 	
+				 	System.out.println("Before Prep Statement");
 					PreparedStatement preparedStatement = con.prepareStatement(sql);
 					preparedStatement.setString(1, password);
 					preparedStatement.setString(2, firstName);
@@ -101,17 +103,21 @@ public class CandidateServlet extends HttpServlet {
 					preparedStatement.setString(6, residentialAddress);
 					preparedStatement.setString(7, workAddress);
 					preparedStatement.setString(8, email);
-					preparedStatement.setLong(9, adhaarNumber);
+					preparedStatement.setLong(9, mobile);
+					preparedStatement.setLong(10, adhaarNumber);
+					preparedStatement.setString(11, messageVoters);
 					if(inputStream!=null)
-					preparedStatement.setBlob(10, inputStream);
-					preparedStatement.setLong(11, mobile);
+					preparedStatement.setBlob(12, inputStream);
+					
 					
 					int res =preparedStatement.executeUpdate();
 					System.out.println(result);
 					if(res>=1){
+						System.out.println(result);
 						resultSet=statement.executeQuery("select * from CANDIDATE where ADHAARNUMBER="+adhaarNumber);
 						if(resultSet.next()){	
 							result="1";
+							System.out.println(result);
 							session.setAttribute("userId", resultSet.getLong(1));
 							session.setAttribute("password", password);
 						}
@@ -131,6 +137,6 @@ public class CandidateServlet extends HttpServlet {
 				}
 			}
 		}
-		response.sendRedirect("LoginFolder/CandidateSignup.jsp?result"+result);
+		response.sendRedirect("LoginFolder/CandidateSignup.jsp?result="+result);
 	}
 }

@@ -93,6 +93,7 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
    			 	 ResultSet resultSet;
    			 	 String sql;	
    				 try{
+   				
    						Class.forName("oracle.jdbc.driver.OracleDriver");
 						Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "garima07");
   	 					statement = con.createStatement();
@@ -118,9 +119,7 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
    									flag=1;
    									session.setAttribute("userId",userId);
    									session.setAttribute("password",password);
-   									%>
-   									 <jsp:forward page="/VoterPanel.jsp"/>
-   									<% 
+   									response.sendRedirect("../VoterPanel.jsp");
    								}
    							}
    							
@@ -128,7 +127,14 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
    								out.print("<font color='white'><p>Invalid Id or Password </p></font>");
    							}
    						}
-   						
+   					//	System.out.print("hey");
+   						if(submit!=null && submit.equals("voterLogout")){
+   						//	System.out.print("hey");
+   							session.removeAttribute("userId");
+   							session.removeAttribute("password");
+   							out.print("<font color=white><p> You have logged out successfully !! </p> </font>");
+   						}
+   						con.close();
    			 	}catch(Exception e){
    			 		System.out.println("Voter Login Exception");
    			 		e.printStackTrace();
